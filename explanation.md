@@ -1,919 +1,440 @@
-# 📚 Angular Concepts Explained - A Beginner's Guide
+# Angular na przykładzie
 
-This document explains the Angular concepts used in this project with real code snippets. Perfect for beginners!
+„Angular to framework, który porządkuje frontend. Zamiast pisać wszystko w jednym miejscu, dzielimy aplikację na komponenty. Każdy komponent ma swoją logikę, HTML i style. W aplikacji główny komponent zawiera tylko szkielet, a konkretny widok podmieniany jest przez router.
 
----
+Routing w Angularze działa bez przeładowania strony. W projekcie, trasy do przepisów są ładowane leniwie, czyli dopiero wtedy, gdy użytkownik ich potrzebuje. To poprawia wydajność, bo aplikacja na starcie pobiera mniej kodu.
 
-## 📖 Table of Contents
+Dane pobierane są przez serwis. Komponent nie zna szczegółów API, tylko woła metody serwisu. Serwis trzyma stan w BehaviorSubject, a widok odbiera dane przez Observable i async pipe. Dzięki temu UI automatycznie reaguje na zmiany.
 
-1. [Components](#components)
-2. [Templates and Binding](#templates-and-binding)
-3. [Routing](#routing)
-4. [Services and Dependency Injection](#services-and-dependency-injection)
-5. [Reactive Forms](#reactive-forms)
-6. [Observables and RxJS](#observables-and-rxjs)
-7. [Directives](#directives)
-8. [Lifecycle Hooks](#lifecycle-hooks)
-9. [Styling](#styling)
-10. [Module Structure](#module-structure)
+Formularz dodawania przepisu jest zrobiony jako Reactive Form. To oznacza, że Angular kontroluje stan pól, walidację i błędy. Mogę dynamicznie dodawać składniki przez FormArray, a formularz nie wyśle danych, jeśli są niepoprawne.
 
----
+Całość działa na TypeScript, więc mam jasno zdefiniowane modele danych i mniej przypadkowych błędów. Najważniejsza rzecz, którą daje Angular, to przewidywalna architektura: wiadomo, gdzie jest widok, gdzie logika i gdzie komunikacja z backendem.”
 
-## 🧩 Components
+## 1. Czym jest Angular i dlaczego powstał
 
-### What is a Component?
+Angular czyli framework SPA (Single Page Application). W SPA przeglądarka nie przeładowuje całej strony przy każdym kliknięciu. Zamiast tego Angular podmienia tylko ten fragment interfejsu, który ma się zmienić.
 
-A **Component** is the basic building block of an Angular application. It's a class that controls a template (HTML) and styles (CSS).
+Po co to jest ważne?
 
-Think of it like a reusable LEGO block - you can use it multiple times in different places.
+- aplikacja działa płynniej,
+- łatwiej budować rozbudowane panele i systemy biznesowe,
+- kod można podzielić na moduły funkcjonalne,
+- łatwiej utrzymać porządek w większym zespole.
 
-### Component Structure
+Angular daje gotowe mechanizmy, które rozwiązują typowe problemy frontendowe:
 
-```typescript
-import { Component } from '@angular/core';
+- komponenty do budowy widoków,
+- router do nawigacji,
+- serwisy do logiki i komunikacji z API,
+- Dependency Injection do przekazywania zależności,
+- Reactive Forms do formularzy,
+- RxJS do reaktywnego przepływu danych,
+- TypeScript do bezpieczeństwa typów.
 
-@Component({
-  selector: 'app-recipe-list',      // HTML tag name - <app-recipe-list></app-recipe-list>
-  standalone: true,                  // Can be used independently
-  imports: [CommonModule, RouterLink], // Dependencies
-  templateUrl: './recipes-list.component.html',
-  styleUrl: './recipes-list.component.scss'
-})
-export class RecipesListComponent {
-  // Component logic goes here
-}
+## 2. Start aplikacji: co dzieje się po uruchomieniu
+
+Punkt wejścia aplikacji to plik `src/main.ts`:
+
+```ts
+import { provideHttpClient } from '@angular/common/http';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
+import 'zone.js';
+import { AppComponent } from './app/app.component';
+import { APP_ROUTES } from './app/app.routes';
+
+bootstrapApplication(AppComponent, {
+	providers: [
+		provideRouter(APP_ROUTES),
+		provideHttpClient()
+	]
+}).catch(err => console.error(err));
 ```
 
-### Key Points:
+Interpretacja krok po kroku:
 
-| Concept | Explanation |
-|---------|------------|
-| **selector** | The HTML tag used to display this component |
-| **standalone** | Modern approach - component doesn't need a module |
-| **imports** | Other components/modules this component needs |
-| **templateUrl** | Path to the HTML file |
-| **styleUrl** | Path to the CSS/SCSS file |
+1. Angular uruchamia aplikację od `AppComponent`.
+2. Rejestruje router, żeby móc obsługiwać adresy URL.
+3. Rejestruje `HttpClient`, żeby aplikacja mogła rozmawiać z backendem.
+4. Dzięki temu od pierwszej sekundy działania masz gotową nawigację i komunikację API.
 
-### Real Example from Our App:
+To jest bardzo charakterystyczne dla Angulara: na starcie deklarujesz „infrastrukturę aplikacji”, a później komponenty tylko z niej korzystają.
 
-From `src/app/app.component.ts`:
+## 3. Komponenty: podstawowy „klocek” Angulara
 
-```typescript
+W Angularze praktycznie każdy ekran to komponent. Komponent ma trzy warstwy:
+
+- logikę (TypeScript),
+- strukturę widoku (HTML),
+- styl (SCSS/CSS).
+
+Komponent główny w Twojej aplikacji:
+
+```ts
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, RouterLink, CommonModule],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+	selector: 'app-root',
+	standalone: true,
+	imports: [RouterOutlet, RouterLink, CommonModule],
+	templateUrl: './app.component.html',
+	styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'Asian Cuisine Recipes';
+	title = 'Asian Cuisine Recipes';
 }
 ```
 
-**What it does:**
-- Creates the root component (main page container)
-- Can be displayed with `<app-root></app-root>` tag
-- Imports RouterOutlet (for page navigation)
-- Has properties like `title` that appear in the template
+Co to mówi o Angularze:
 
----
+- `standalone: true` oznacza nowoczesny model bez obowiązkowego NgModule dla każdego komponentu,
+- `imports` deklaruje, czego komponent potrzebuje (np. routera i dyrektyw),
+- zmienna `title` jest częścią stanu komponentu i od razu może być użyta w HTML.
 
-## 🎨 Templates and Binding
+To podejście daje czytelność: każdy komponent jest „zamkniętą jednostką”, którą da się łatwo rozwijać i testować.
 
-### What is a Template?
+## 4. Routing i lazy loading: nawigacja bez przeładowania strony
 
-The **Template** is the HTML that defines what the user sees. Angular templates support special syntax for dynamic content.
+Routing odpowiada za to, jaki komponent ma być widoczny pod danym adresem.
 
-### Types of Binding
+Trasy główne projektu:
 
-#### 1. **Property Binding** - Set HTML properties from component data
-
-```html
-<!-- Syntax: [property]="component_property" -->
-<img
-  [src]="recipe.imageUrl"     <!-- Shows recipe image -->
-  [alt]="recipe.name"         <!-- Alternative text -->
-  class="recipe-image"
->
-
-<!-- This is equivalent to: -->
-<!-- const img = document.querySelector('img');
-     img.src = recipe.imageUrl;
-     img.alt = recipe.name; -->
-```
-
-#### 2. **Event Binding** - React to user interactions
-
-```html
-<!-- Syntax: (event)="method()" -->
-<button (click)="deleteRecipe(id)">
-  Delete Recipe
-</button>
-
-<select (change)="filterByCuisine($event)">
-  <option *ngFor="let cuisine of cuisines">
-    {{ cuisine }}
-  </option>
-</select>
-```
-
-#### 3. **Two-Way Binding** - Update both ways
-
-```html
-<!-- Syntax: [(ngModel)]="property" -->
-<input [(ngModel)]="searchText">
-
-<!-- If user types "Pad Thai", searchText updates
-     If searchText changes in component, input updates -->
-```
-
-#### 4. **Interpolation** - Display component data as text
-
-```html
-<!-- Syntax: {{ component_property }} -->
-<h1>{{ title }}</h1>
-<!-- Shows: Asian Cuisine Recipes -->
-
-<p>Prep Time: {{ recipe.prepTime }} minutes</p>
-<!-- Shows: Prep Time: 15 minutes -->
-
-<p>Total Time: {{ getTotalTime() }}</p>
-<!-- Can call methods too! -->
-```
-
-### Real Examples from Our App:
-
-From `recipes-list.component.html`:
-
-```html
-<!-- Property binding -->
-<img
-  [src]="recipe.imageUrl || 'assets/placeholder.jpg'"
-  [alt]="recipe.name"
->
-
-<!-- Event binding -->
-<button
-  *ngFor="let cuisine of cuisineList"
-  (click)="filterByCuisine(cuisine)"
-  class="filter-btn"
->
-
-<!-- Interpolation -->
-<h3>{{ recipe.name }}</h3>
-<span>⏱️ {{ recipe.prepTime + recipe.cookTime }} min</span>
-```
-
----
-
-## 🗺️ Routing
-
-### What is Routing?
-
-**Routing** allows users to navigate between different pages without reloading the entire page. It's like having multiple screens in one app.
-
-### How Angular Routing Works
-
-```
-URL → Angular Router → Finds Matching Route → Displays Component
-```
-
-### Define Routes
-
-From `src/app/app.routes.ts`:
-
-```typescript
+```ts
 export const APP_ROUTES: Routes = [
-  {
-    path: '',
-    redirectTo: '/recipes',
-    pathMatch: 'full'
-  },
-  {
-    // When user goes to /recipes, load RecipesListComponent
-    path: 'recipes',
-    loadChildren: () => import('./features/recipes/recipes.routes')
-                        .then(m => m.RECIPES_ROUTES)
-    // loadChildren = Lazy Loading: Only load component when needed
-  },
-  {
-    // When user goes to /about
-    path: 'about',
-    loadComponent: () => import('./features/about/about.component')
-                        .then(c => c.AboutComponent)
-  },
-  {
-    // Catch undefined routes - go to /recipes
-    path: '**',
-    redirectTo: '/recipes'
-  }
+	{
+		path: '',
+		redirectTo: '/recipes',
+		pathMatch: 'full'
+	},
+	{
+		path: 'recipes',
+		loadChildren: () => import('./features/recipes/recipes.routes').then(m => m.RECIPES_ROUTES)
+	},
+	{
+		path: 'about',
+		loadComponent: () => import('./features/about/about.component').then(c => c.AboutComponent)
+	},
+	{
+		path: '**',
+		redirectTo: '/recipes'
+	}
 ];
 ```
 
-### Navigate in Template
+Najważniejsze znaczenia:
+
+- `redirectTo` ustawia domyślną stronę,
+- `loadChildren` i `loadComponent` realizują lazy loading,
+- `path: '**'` to zabezpieczenie na nieznane adresy.
+
+Lazy loading to kluczowa cecha wydajnościowa Angulara: użytkownik pobiera tylko ten kod, który jest mu aktualnie potrzebny. To skraca czas pierwszego ładowania.
+
+Trasy funkcji przepisów:
+
+```ts
+export const RECIPES_ROUTES: Routes = [
+	{
+		path: '',
+		loadComponent: () => import('./pages/recipes-list/recipes-list.component').then(c => c.RecipesListComponent)
+	},
+	{
+		path: 'create',
+		loadComponent: () => import('./pages/recipe-form/recipe-form.component').then(c => c.RecipeFormComponent)
+	},
+	{
+		path: ':id',
+		loadComponent: () => import('./pages/recipe-detail/recipe-detail.component').then(c => c.RecipeDetailComponent)
+	}
+];
+```
+
+`':id'` to parametr trasy, czyli np. adres `/recipes/12` otwiera szczegóły przepisu o identyfikatorze `12`.
+
+## 5. Szablony: jak Angular łączy dane z widokiem
+
+W Angularze HTML nie jest „martwy”. To szablon, który żyje razem z logiką komponentu.
+
+Podstawowe mechanizmy wiązania danych:
+
+- interpolacja `{{ ... }}` wyświetla wartość,
+- property binding `[prop]="..."` ustawia właściwości elementów,
+- event binding `(event)="..."` reaguje na zdarzenia,
+- dyrektywy `*ngIf` i `*ngFor` sterują strukturą widoku.
+
+Przykład z nagłówka aplikacji:
 
 ```html
-<!-- Using RouterLink directive -->
-<a routerLink="/recipes" class="nav-link">
-  All Recipes
-</a>
+<h1 class="logo">
+	<span class="emoji">🍜</span>
+	{{ title }}
+</h1>
 
-<!-- Dynamic routing with parameter -->
-<a [routerLink]="['/recipes', recipe.id]">
-  View Recipe
-</a>
+<a routerLink="/recipes" class="nav-link">All Recipes</a>
 
-<!-- This creates URL: /recipes/1 (if recipe.id = 1) -->
+<router-outlet></router-outlet>
 ```
 
-### Navigate Programmatically
+Czyli w praktyce:
 
-```typescript
-constructor(private router: Router) {}
+- `{{ title }}` pobiera dane z komponentu,
+- `routerLink` robi nawigację bez odświeżania strony,
+- `router-outlet` to miejsce, gdzie Angular „wstrzykuje” aktywny widok trasy.
 
-goToRecipe(id: number) {
-  this.router.navigate(['/recipes', id]);
-}
+Przykład interakcji i listy:
+
+```html
+<button
+	*ngFor="let cuisine of cuisineList"
+	[class.active]="selectedCuisine === cuisine"
+	(click)="filterByCuisine(cuisine)"
+	class="filter-btn"
+>
+	{{ cuisine }}
+</button>
 ```
 
-### Access Route Parameters
+Przykład renderowania danych reaktywnych:
 
-From `recipe-detail.component.ts`:
-
-```typescript
-constructor(private route: ActivatedRoute) {}
-
-ngOnInit() {
-  // Get the recipe ID from URL parameter
-  this.route.params.subscribe((params) => {
-    const id = params['id'];
-    console.log('Recipe ID:', id);
-  });
-}
+```html
+<div class="recipes-grid" *ngIf="recipes$ | async as recipes; else loading">
+	<div
+		*ngFor="let recipe of filteredRecipes; trackBy: trackByRecipeId"
+		class="recipe-card"
+	>
+		<img
+			[src]="recipe.imageUrl || fallbackImage"
+			[alt]="recipe.name"
+			(error)="onImageError($event)"
+			class="recipe-image"
+		>
+	</div>
+</div>
 ```
 
-**How it works:**
-1. User navigates to `/recipes/42`
-2. Angular extracts `42` from URL
-3. Component receives `params['id'] = 42`
-4. Component loads recipe with ID 42
+Najważniejszy wniosek: widok jest deklaracją tego, jak ma wyglądać UI dla aktualnego stanu danych.
 
----
+## 6. Serwisy i Dependency Injection: porządek w logice
 
-## 💉 Services and Dependency Injection
+W dobrze zorganizowanym Angularze komponent nie powinien zawierać całej logiki biznesowej ani szczegółów API. Od tego są serwisy.
 
-### What is a Service?
+Serwis projektu:
 
-A **Service** is a class that contains reusable logic. It's shared between components.
-
-**Why use services?**
-- Avoid code duplication
-- Separate concerns (data fetching, API calls)
-- Easy to test
-
-### Creating a Service
-
-From `src/app/services/recipe.service.ts`:
-
-```typescript
+```ts
 @Injectable({
-  providedIn: 'root'  // Available app-wide (singleton)
+	providedIn: 'root'
 })
 export class RecipeService {
-  constructor(private http: HttpClient) {}
+	private apiUrl = `${environment.apiUrl}/recipes`;
 
-  // Method to get all recipes
-  getAllRecipes(): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes`);
-  }
+	private recipesSubject = new BehaviorSubject<Recipe[]>([]);
+	public recipes$ = this.recipesSubject.asObservable();
 
-  // Method to delete a recipe
-  deleteRecipe(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
+	constructor(private http: HttpClient) {
+		this.loadRecipes();
+	}
 }
 ```
 
-### Dependency Injection (DI)
+W praktyce:
 
-**Dependency Injection** means Angular automatically provides dependencies to your component.
+- `providedIn: 'root'` tworzy jeden wspólny egzemplarz serwisu w całej aplikacji,
+- `HttpClient` jest dostarczony przez Angular DI,
+- adres backendu pobierasz z konfiguracji środowiska,
+- serwis ma własny stan danych (`BehaviorSubject`) i udostępnia go jako strumień.
 
-```typescript
-export class RecipesListComponent {
-  // Constructor tells Angular: "I need RecipeService"
-  // Angular automatically creates it and passes it
-  constructor(private recipeService: RecipeService) {
-    // Now we can use it!
-    this.recipes$ = recipeService.getAllRecipes();
-  }
+Wstrzyknięcie serwisu w komponencie:
+
+```ts
+constructor(private recipeService: RecipeService) {}
+```
+
+To podejście daje duży plus przy utrzymaniu projektu: zmieniasz logikę API w jednym miejscu, a nie w kilku komponentach.
+
+## 7. Reaktywność: Observable + BehaviorSubject + async pipe
+
+To jeden z najważniejszych fundamentów Angulara w aplikacjach danych.
+
+Flow projektu:
+
+1. Serwis pobiera dane z backendu (`HttpClient`).
+2. Wynik zapisuje do `BehaviorSubject`.
+3. Komponent pobiera `Observable` (`recipes$`).
+4. HTML używa `async pipe`, który renderuje dane i sam zarządza subskrypcją.
+
+Fragment pobierania danych:
+
+```ts
+private loadRecipes(): void {
+	this.http.get<Recipe[]>(this.apiUrl).subscribe(
+		(recipes) => {
+			this.recipesSubject.next(recipes);
+		},
+		(error) => {
+			console.error('Error loading recipes:', error);
+		}
+	);
 }
 ```
 
-**What Angular does:**
-1. Sees `RecipeService` parameter in constructor
-2. Checks if it already has an instance
-3. If not, creates one
-4. Passes it to the component
+Udostępnienie strumienia w komponencie listy:
 
-**Benefits:**
-- Component doesn't worry about creating RecipeService
-- Easy to test (can inject mock service)
-- Automatic lifecycle management
-
----
-
-## 📋 Reactive Forms
-
-### What are Reactive Forms?
-
-**Reactive Forms** are form controls created programmatically in your component. They're powerful and flexible.
-
-### Form Building Basics
-
-From `recipe-form.component.ts`:
-
-```typescript
-export class RecipeFormComponent {
-  recipeForm: FormGroup;
-
-  constructor(private fb: FormBuilder) {
-    // Create form with validation
-    this.recipeForm = this.fb.group({
-      name: [
-        '',  // Initial value
-        [Validators.required, Validators.minLength(3)]  // Validators
-      ],
-      cuisine: ['', Validators.required],
-      difficulty: ['easy', Validators.required],
-
-      // FormArray - array of dynamic values
-      ingredients: this.fb.array([
-        this.fb.control('', Validators.required),
-        this.fb.control('', Validators.required)
-      ])
-    });
-  }
-
-  // Get ingredients array
-  get ingredients(): FormArray {
-    return this.recipeForm.get('ingredients') as FormArray;
-  }
-
-  // Add new ingredient
-  addIngredient(): void {
-    this.ingredients.push(this.fb.control('', Validators.required));
-  }
-
-  // Submit form
-  onSubmit(): void {
-    if (this.recipeForm.invalid) {
-      console.log('Form is invalid!');
-      return;
-    }
-
-    console.log(this.recipeForm.value); // Get all form data
-  }
-}
+```ts
+recipes$ = this.recipeService.getAllRecipes();
 ```
 
-### Form in Template
+Renderowanie przez `async`:
 
 ```html
-<!-- Bind FormGroup -->
-<form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
-
-  <!-- Bind individual control -->
-  <input
-    formControlName="name"
-    placeholder="Recipe name"
-  >
-
-  <!-- Show validation error -->
-  <small *ngIf="hasError('name', 'required')">
-    Name is required
-  </small>
-
-  <!-- FormArray - loop through array -->
-  <div formArrayName="ingredients">
-    <input
-      *ngFor="let ing of ingredients.controls; let i = index"
-      [formControl]="ing"
-    >
-  </div>
-
-  <!-- Submit button - disabled if form invalid -->
-  <button
-    type="submit"
-    [disabled]="recipeForm.invalid"
-  >
-    Create Recipe
-  </button>
-</form>
+<div class="recipes-grid" *ngIf="recipes$ | async as recipes; else loading">
 ```
 
-### Form States
+Dlaczego to podejście jest dobre:
 
-```typescript
-// Check if valid
-if (form.valid) { }
+- dane i widok są zsynchronizowane,
+- mniej ręcznego kodu do obsługi subskrypcji,
+- łatwiej rozszerzyć aplikację o kolejne źródła danych i stany.
 
-// Check if invalid
-if (form.invalid) { }
+## 8. Reactive Forms: formularz jako kontrolowany model
 
-// Check if touched (user has interacted)
-if (form.touched) { }
+W aplikacji tworzenia przepisu jest przykładem pełnego, reaktywnego podejścia.
 
-// Get form data as object
-const data = form.value;
+Definicja formularza:
 
-// Reset form
-form.reset();
-
-// Mark all as touched (shows all errors)
-form.markAllAsTouched();
-```
-
----
-
-## 🔄 Observables and RxJS
-
-### What are Observables?
-
-**Observables** are like event streams. They emit values over time, and components can "subscribe" to them.
-
-**Analogy:** Like a newspaper subscription - publisher (Observable) sends news, subscribers receive it.
-
-### Simple Example
-
-```typescript
-// Create an Observable that emits numbers
-const numbers$ = new Observable(observer => {
-  observer.next(1);
-  observer.next(2);
-  observer.next(3);
-});
-
-// Subscribe to it
-numbers$.subscribe(value => {
-  console.log(value);  // Prints: 1, 2, 3
+```ts
+this.recipeForm = this.fb.group({
+	name: ['', [Validators.required, Validators.minLength(3)]],
+	cuisine: ['', Validators.required],
+	description: ['', [Validators.required, Validators.minLength(10)]],
+	difficulty: ['easy', Validators.required],
+	prepTime: ['', [Validators.required, Validators.min(0)]],
+	cookTime: ['', [Validators.required, Validators.min(0)]],
+	servings: ['', [Validators.required, Validators.min(1)]],
+	imageUrl: [''],
+	instructions: ['', [Validators.required, Validators.minLength(20)]],
+	ingredients: this.fb.array([
+		this.fb.control('', Validators.required)
+	])
 });
 ```
 
-### Observables in Our App
-
-From `recipe.service.ts`:
-
-```typescript
-export class RecipeService {
-  // BehaviorSubject - special Observable that remembers last value
-  private recipesSubject = new BehaviorSubject<Recipe[]>([]);
-
-  // Public Observable for components to subscribe
-  public recipes$ = this.recipesSubject.asObservable();
-
-  // HTTP Observable - gets recipes from server
-  getAllRecipes(): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.apiUrl}/recipes`);
-  }
-}
-```
-
-### Subscribe to Observables
-
-```typescript
-export class RecipesListComponent {
-  // Using $ suffix convention for Observables
-  recipes$: Observable<Recipe[]>;
-
-  constructor(private recipeService: RecipeService) {
-    // Get Observable from service
-    this.recipes$ = recipeService.getAllRecipes();
-  }
-
-  ngOnInit() {
-    // Subscribe manually (not recommended in templates)
-    this.recipes$.subscribe(
-      recipes => console.log('Received:', recipes),
-      error => console.error('Error:', error)
-    );
-  }
-}
-```
-
-### Using Async Pipe (Recommended)
+Podłączenie formularza do szablonu:
 
 ```html
-<!-- async pipe: automatically subscribes -->
-<div *ngIf="recipes$ | async as recipes; else loading">
-  <!-- recipes contains the data -->
-  <div *ngFor="let recipe of recipes">
-    <h3>{{ recipe.name }}</h3>
-  </div>
-</div>
-
-<!-- Show while loading -->
-<ng-template #loading>
-  <p>Loading...</p>
-</ng-template>
+<form [formGroup]="recipeForm" (ngSubmit)="onSubmit()" class="recipe-form">
 ```
 
-**Why async pipe?**
-- Automatically unsubscribes when component is destroyed
-- Cleaner code
-- Prevents memory leaks
-
-### HTTP Observables
-
-```typescript
-// GET request returns Observable
-this.recipeService.getRecipeById(id).subscribe(
-  (recipe) => {
-    // Success - got the recipe
-    console.log('Recipe:', recipe);
-  },
-  (error) => {
-    // Error - something went wrong
-    console.error('Failed to load recipe:', error);
-  }
-);
-
-// POST request
-this.recipeService.createRecipe(newRecipe).subscribe(
-  (createdRecipe) => {
-    console.log('Created:', createdRecipe);
-    this.router.navigate(['/recipes', createdRecipe.id]);
-  },
-  (error) => {
-    console.error('Failed to create recipe:', error);
-  }
-);
-```
-
----
-
-## 📍 Directives
-
-### What are Directives?
-
-**Directives** are instructions for Angular on how to render templates. They modify DOM behavior or structure.
-
-### Structural Directives (Change DOM)
-
-#### *ngIf - Conditional Rendering
+Dynamiczna lista składników przez `FormArray`:
 
 ```html
-<!-- Show only if condition is true -->
-<div *ngIf="isLoading">
-  <p>Loading...</p>
+<div formArrayName="ingredients">
+	<div
+		*ngFor="let ingredient of ingredients.controls; let i = index"
+		class="ingredient-input-group"
+	>
+		<input
+			type="text"
+			class="form-control"
+			[formControlName]="i"
+			placeholder="e.g., 2 cups of rice noodles"
+		>
+	</div>
 </div>
-
-<!-- Show/hide with else template -->
-<div *ngIf="recipes.length > 0; else noRecipes">
-  <p>Found recipes!</p>
-</div>
-
-<ng-template #noRecipes>
-  <p>No recipes found</p>
-</ng-template>
-
-<!-- The ng-template doesn't show by itself, it's used as template -->
 ```
 
-#### *ngFor - Loop
+Walidacja przed wysłaniem:
+
+```ts
+if (this.recipeForm.invalid) {
+	this.recipeForm.markAllAsTouched();
+	return;
+}
+```
+
+Najważniejsza idea: formularz ma własny stan, który Angular kontroluje centralnie. Dzięki temu łatwo wyświetlać błędy, blokować wysyłkę i walidować dane jeszcze przed wywołaniem API.
+
+## 9. Cykl życia komponentu i parametry trasy
+
+Hook `ngOnInit` uruchamia się po inicjalizacji komponentu. To typowe miejsce do pobrania danych wejściowych i wykonania pierwszego zapytania.
+
+W komponencie szczegółu przepisu:
+
+```ts
+ngOnInit(): void {
+	this.route.params.subscribe(
+		(params: any) => {
+			const id = params['id'];
+			this.loadRecipe(id);
+		}
+	);
+}
+```
+
+To realizuje prosty i skuteczny scenariusz:
+
+- użytkownik wchodzi na adres z `:id`,
+- Angular odczytuje parametr,
+- komponent pobiera właściwy rekord,
+- widok pokazuje ładowanie, wynik albo błąd.
+
+## 10. TypeScript i kontrakt danych
+
+Angular opiera się o TypeScript, a więc o jawne typy.
+
+Model przepisu w serwisie:
+
+```ts
+export interface Recipe {
+	id: number;
+	name: string;
+	cuisine: string;
+	description: string;
+	ingredients: string[];
+	instructions: string;
+	difficulty: 'easy' | 'medium' | 'hard';
+	prepTime: number;
+	cookTime: number;
+	servings: number;
+	imageUrl?: string;
+	createdAt?: string;
+	updatedAt?: string;
+}
+```
+
+To jest „umowa” między frontendem a backendem. Jeśli backend zwróci dane w złym formacie, łatwiej to wykryć wcześniej.
+
+## 11. Pipes: prezentacja danych bez mieszania logiki
+
+Pipes służą do formatowania danych w samym szablonie.
+
+Przykłady z kodu:
 
 ```html
-<!-- Loop through array -->
-<li *ngFor="let recipe of recipes">
-  {{ recipe.name }}
-</li>
-
-<!-- With index -->
-<li *ngFor="let recipe of recipes; let i = index">
-  {{ i + 1 }}. {{ recipe.name }}
-</li>
-
-<!-- With trackBy for performance -->
-<li *ngFor="let recipe of recipes; trackBy: trackByRecipeId">
-  {{ recipe.name }}
-</li>
+{{ recipe.difficulty | uppercase }}
+{{ recipe.createdAt | date:'short' }}
 ```
 
-The `trackBy` function:
+Dzięki temu logika komponentu pozostaje czysta, a formatowanie jest deklaratywne i łatwe do czytania.
 
-```typescript
-// Without trackBy: Angular re-renders entire list on any change
-// With trackBy: Angular knows which items changed
-trackByRecipeId(index: number, recipe: Recipe): number {
-  return recipe.id;  // Use unique identifier
-}
-```
+## 12. Przepływ „od kliknięcia do danych” w aplikacji
 
-### Attribute Directives (Modify Element)
+Idea Angulara:
 
-#### ngClass - Dynamic CSS Classes
+1. Użytkownik klika link `routerLink`, np. przejście do listy lub szczegółu przepisu.
+2. Router aktywuje odpowiedni komponent i renderuje go w `router-outlet`.
+3. Komponent przez DI korzysta z `RecipeService`.
+4. Serwis wykonuje zapytanie HTTP.
+5. Odpowiedź trafia do `BehaviorSubject`.
+6. Szablon (z `async pipe`) dostaje nowe dane i od razu odświeża UI.
 
-```html
-<!-- Add class conditionally -->
-<button [ngClass]="{ 'active': isActive }">
-  Click me
-</button>
+Czyli siła Angulara to przewidywalny przepływ danych i odpowiedzialności.
 
-<!-- Multiple conditions -->
-<div [ngClass]="{
-  'loading': isLoading,
-  'error': hasError,
-  'success': !hasError && !isLoading
-}">
-  Status
-</div>
+## 13. Co warto zapamiętać jako „esencję Angulara”
 
-<!-- In TypeScript -->
-export class MyComponent {
-  isActive = true;
-  isLoading = false;
-  hasError = false;
-}
-```
+Widzimy, że Angular:
 
-#### ngStyle - Dynamic CSS
+- narzuca czytelną strukturę projektu,
+- oddziela warstwę widoku od logiki i danych,
+- wspiera skalowanie aplikacji przez routing i lazy loading,
+- daje mocne narzędzia do formularzy,
+- promuje reaktywny model pracy z danymi,
+- ułatwia rozwój zespołowy dzięki konsekwentnym wzorcom.
 
-```html
-<!-- Set styles conditionally -->
-<div [ngStyle]="{ 'color': isError ? 'red' : 'black' }">
-  Message
-</div>
-
-<!-- Multiple styles -->
-<div [ngStyle]="{
-  'background-color': bgColor,
-  'padding': padding + 'px',
-  'border': hasBorder ? '1px solid gray' : 'none'
-}">
-  Styled div
-</div>
-```
-
-### Real Examples from Our App
-
-From `recipes-list.component.html`:
-
-```html
-<!-- *ngIf with async pipe -->
-<div *ngIf="recipes$ | async as recipes; else loading">
-  <!-- recipes is the data -->
-</div>
-
-<ng-template #loading>
-  <p>Loading recipes...</p>
-</ng-template>
-
-<!-- *ngFor with trackBy -->
-<div *ngFor="let recipe of recipes; trackBy: trackByRecipeId">
-  <!-- recipe card -->
-</div>
-
-<!-- [ngClass] for dynamic styling -->
-<span class="badge difficulty" [ngClass]="'difficulty-' + recipe.difficulty">
-  {{ recipe.difficulty | uppercase }}
-</span>
-```
-
----
-
-## 🔄 Lifecycle Hooks
-
-### What are Lifecycle Hooks?
-
-**Lifecycle Hooks** are methods that run at specific times in a component's life.
-
-### Timeline
-
-```
-Component Created → Initialized → Rendered → Destroyed
-      ↓                ↓              ↓           ↓
-    constructor    ngOnInit      rendered    ngOnDestroy
-```
-
-### Common Hooks
-
-| Hook | When | Use Case |
-|------|------|----------|
-| `ngOnInit` | After component is created | Load initial data |
-| `ngOnChanges` | When @Input changes | React to parent changes |
-| `ngOnDestroy` | Before component is destroyed | Cleanup, unsubscribe |
-| `ngAfterViewInit` | After view is rendered | Access DOM elements |
-
-### Real Example
-
-From `recipe-detail.component.ts`:
-
-```typescript
-export class RecipeDetailComponent implements OnInit, OnDestroy {
-  recipe: Recipe | null = null;
-  isLoading = true;
-  subscription: Subscription | null = null;
-
-  constructor(
-    private route: ActivatedRoute,
-    private recipeService: RecipeService
-  ) {}
-
-  // 1. Component is created
-  // Constructor is called
-
-  // 2. Component is initialized
-  ngOnInit(): void {
-    // Perfect place to load data
-    this.subscription = this.route.params.subscribe((params) => {
-      const id = params['id'];
-      this.loadRecipe(id);
-    });
-  }
-
-  // 3. Component is rendered and used...
-
-  // 4. Component is destroyed
-  ngOnDestroy(): void {
-    // Cleanup: unsubscribe to prevent memory leaks
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-
-  private loadRecipe(id: number): void {
-    this.isLoading = true;
-    this.recipeService.getRecipeById(id).subscribe(
-      (recipe) => {
-        this.recipe = recipe;
-        this.isLoading = false;
-      }
-    );
-  }
-}
-```
-
----
-
-## 🎨 Styling
-
-### Global Styles
-
-`src/styles.scss` - Applied to entire app
-
-```scss
-/* Global typography */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-}
-
-/* Global utilities */
-.text-center {
-  text-align: center;
-}
-
-.mt-2 {
-  margin-top: 1rem;
-}
-```
-
-### Component Styles
-
-`src/app/app.component.scss` - Only for this component
-
-```scss
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.app-header {
-  background-color: #667eea;
-  padding: 1rem;
-}
-
-.app-main {
-  flex: 1;  /* Takes remaining space */
-}
-```
-
-### Scoped Styles
-
-Styles in component file only apply to that component's template:
-
-```html
-<!-- app.component.html -->
-<div class="header">  <!-- Uses .header from app.component.scss -->
-  Logo
-</div>
-```
-
-```typescript
-// recipes-list.component.ts - CAN'T see .header style
-// Even if we try to use it, it won't work
-```
-
-### SCSS Features
-
-```scss
-// Variables
-$primary-color: #667eea;
-$spacing-unit: 1rem;
-
-// Nesting
-.card {
-  padding: $spacing-unit;
-
-  .card-title {
-    color: $primary-color;
-  }
-}
-
-// Mixins
-@mixin flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.centered {
-  @include flex-center;
-}
-
-// Functions
-.button {
-  padding: $spacing-unit * 2;
-}
-```
-
----
-
-## 📦 Module Structure
-
-### Feature-Based Organization
-
-Our app is organized by feature:
-
-```
-app/
-├── services/              # Shared services
-├── features/              # Feature modules
-│   ├── recipes/           # Recipes feature
-│   │   ├── pages/
-│   │   │   ├── recipes-list/
-│   │   │   ├── recipe-detail/
-│   │   │   └── recipe-form/
-│   │   └── recipes.routes.ts
-│   └── about/             # About feature
-│       ├── about.component.ts
-│       └── about.component.html
-```
-
-### Lazy Loading
-
-Routes can load components on-demand:
-
-```typescript
-// app.routes.ts
-{
-  path: 'recipes',
-  // This component only loads when user visits /recipes
-  loadChildren: () => import('./features/recipes/recipes.routes')
-                      .then(m => m.RECIPES_ROUTES)
-}
-```
-
-**Benefits:**
-- Smaller initial bundle
-- Faster app startup
-- Components load only when needed
-
----
-
-## 🎓 Summary - Key Takeaways
-
-| Concept | Purpose | Example |
-|---------|---------|---------|
-| **Component** | Reusable UI piece | RecipesListComponent |
-| **Template** | HTML with Angular syntax | `{{ recipe.name }}` |
-| **Service** | Shared logic | RecipeService |
-| **Routing** | Navigate between pages | `/recipes` → RecipesListComponent |
-| **Binding** | Connect data to view | `[src]="image"` |
-| **Forms** | Collect user input | RecipeFormComponent |
-| **Observables** | Event streams | `recipes$` |
-| **Directives** | DOM instructions | `*ngIf`, `*ngFor` |
-| **Lifecycle Hooks** | Component events | `ngOnInit()` |
-
----
-
-## 🚀 Next Steps
-
-1. **Read** the code in the project with this explanation
-2. **Modify** a component to understand how it works
-3. **Create** a new component following the patterns
-4. **Experiment** with forms and observables
-5. **Check** the [Angular Documentation](https://angular.io)
-
-Happy learning! 🎉
+Angular jest świetny tam, gdzie aplikacja ma być większa, długowieczna i rozwijana przez więcej niż jedną osobę.
