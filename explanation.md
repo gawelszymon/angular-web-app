@@ -31,6 +31,71 @@ Angular daje gotowe mechanizmy, które rozwiązują typowe problemy frontendowe:
 - RxJS do reaktywnego przepływu danych,
 - TypeScript do bezpieczeństwa typów.
 
+## 14. Angular vs React
+
+| Aspekt | Angular | React |
+|--------|---------|-------|
+| **Typ** | Full framework | Biblioteka (tylko widok) |
+| **Architektura** | MVC/MVT z dużą ilością konwencji | Flex, komponentów i hook'ów |
+| **Routing** | Wbudowany (`@angular/router`) | Osobne biblioteki (React Router) |
+| **Formularze** | Reactive Forms, bardzo mocne i kontrolowane | Hook `useState`, mniej konwencji |
+| **Zarządzanie stanem** | Services + RxJS/Observable | useState, useContext, lub Zustand/Redux |
+| **Dependency Injection** | Wbudowany DI system | Nie ma, zwyczajnie importujesz |
+| **Data binding** | Dwukierunkowe domyślnie (`[(ngModel)]`) | Jednokierunkowe (React jest bardziej „explicite") |
+| **Reaktywność** | RxJS Observable + async pipe | React hooks (useState, useEffect) |
+| **Nauka** | Większa krzywa uczenia się | Łatwiejsze na początek |
+| **Ekosystem** | Monolityczny, wiele rzeczy „in the box" | Modularny, sam dobierasz biblioteki |
+| **TypeScript** | Domyślnie i bardzo dobrze wspierany | Opcjonalnie, ale coraz bardziej wspieran |
+| **Bundle size** | Duży (Angular sам jest ciężki) | Mniejszy niż Angular, ale zależy od bibliotek |
+| **Wydajność** | Zależy od optymalizacji, ale solidna | Bardzo dobra, szczególnie przy proper memoization |
+| **Community** | Silne, ale mniejsze niż React | Ogromne, bardzo wiele zasobów |
+| **Kto używa** | Google, IBM, duże korporacje | Facebook, Netflix, Airbnb, większość startupów |
+| **Najlepsze do** | Duże, skalowalne aplikacje biznesowe | Dynamicznych interfejsów, szybkich iteracji |
+
+### Konkretne przykłady z naszej aplikacji
+
+**Routing w Angularze:**
+```ts
+{
+  path: 'recipes/:id',
+  loadComponent: () => import('./recipe-detail/recipe-detail.component')
+    .then(c => c.RecipeDetailComponent)
+}
+```
+
+**Routing w React (React Router):**
+```tsx
+<Route path="recipes/:id" Component={RecipeDetail} />
+```
+
+**Formularze w Angularze:**
+```ts
+this.recipeForm = this.fb.group({
+  name: ['', Validators.required],
+  ingredients: this.fb.array([...])
+});
+```
+
+**Formularze w React (z hook'iem):**
+```tsx
+const [recipe, setRecipe] = useState({ name: '', ingredients: [] });
+const handleNameChange = (e) => setRecipe({ ...recipe, name: e.target.value });
+```
+
+**Observable w Angularze:**
+```ts
+recipes$ = this.recipeService.getAllRecipes();
+// W HTML: *ngIf="recipes$ | async as recipes"
+```
+
+**Hook w React:**
+```tsx
+const [recipes, setRecipes] = useState([]);
+useEffect(() => {
+  recipeService.getAllRecipes().then(setRecipes);
+}, []);
+```
+
 ## 2. Start aplikacji: co dzieje się po uruchomieniu
 
 Punkt wejścia aplikacji to plik `src/main.ts`:
