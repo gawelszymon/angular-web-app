@@ -71,6 +71,22 @@ recipes/
 | **Template Binding** | `.html` pliki | `{{ }}`, `[property]`, `(event)`, `[(ngModel)]` |
 | **Directives** | `*ngIf`, `*ngFor` | Warunkowe i powtarzalne elementy HTML |
 
+<br>
+
+**Standalone Components** – Angular bez modułów (NgModules). Komponent sam w sobie jest niezależny i można go importować bezpośrednio.
+
+**Lazy Loading** – komponent ładuje się dopiero gdy użytkownik wejdzie na daną ścieżkę, a nie od razu przy starcie aplikacji.
+
+**Reactive Forms** – formularz z logiką w TypeScript. Pozwala na dynamiczne dodawanie/usuwanie pól (np. lista składników) z pełną kontrolą walidacji.
+
+**Services** – singletonowe klasy do logiki biznesowej (np. HTTP, współdzielenie danych). Nie trzymają stanu widoku, tylko dane i metody.
+
+**Observables** – strumienie asynchroniczne. Przy każdym pobraniu danych (HTTP, zdarzenia) automatycznie aktualizują widok bez `setTimeout` czy callbacków.
+
+**Template Binding** – komunikacja komponent ↔ widok. `{{ wartość }}` (wyświetlanie), `[właściwość]` (ustawianie), `(zdarzenie)` (nasłuchiwanie), `[(ngModel)]` (dwukierunkowe).
+
+**Directives** – atrybuty zmieniające strukturę HTML: `*ngIf="warunek"` (pokaż/ukryj), `*ngFor="let x of lista"` (powtórz element).
+
 ---
 
 ## 🔌 Jak Się Łączy?
