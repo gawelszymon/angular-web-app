@@ -1,6 +1,6 @@
 # Angular na przykładzie
 
-„Angular to framework, który porządkuje frontend. Zamiast pisać wszystko w jednym miejscu, dzielimy aplikację na komponenty. Każdy komponent ma swoją logikę, HTML i style. W aplikacji główny komponent zawiera tylko szkielet, a konkretny widok podmieniany jest przez router.
+Angular przede wszystkim porządkuje frontend. Zamiast pisać wszystko w jednym miejscu, dzielimy aplikację na komponenty. Każdy komponent ma swoją logikę, HTML i style. W aplikacji główny komponent zawiera tylko szkielet, a konkretny widok podmieniany jest przez router.
 
 Routing w Angularze działa bez przeładowania strony. W projekcie, trasy do przepisów są ładowane leniwie, czyli dopiero wtedy, gdy użytkownik ich potrzebuje. To poprawia wydajność, bo aplikacja na starcie pobiera mniej kodu.
 
@@ -8,7 +8,7 @@ Dane pobierane są przez serwis. Komponent nie zna szczegółów API, tylko woł
 
 Formularz dodawania przepisu jest zrobiony jako Reactive Form. To oznacza, że Angular kontroluje stan pól, walidację i błędy. Mogę dynamicznie dodawać składniki przez FormArray, a formularz nie wyśle danych, jeśli są niepoprawne.
 
-Całość działa na TypeScript, więc mam jasno zdefiniowane modele danych i mniej przypadkowych błędów. Najważniejsza rzecz, którą daje Angular, to przewidywalna architektura: wiadomo, gdzie jest widok, gdzie logika i gdzie komunikacja z backendem.”
+Całość działa na TypeScript, więc mam jasno zdefiniowane modele danych i mniej przypadkowych błędów. Najważniejsza rzecz, którą daje Angular, to przewidywalna architektura: wiadomo, gdzie jest widok, gdzie logika i gdzie komunikacja z backendem.
 
 ## 1. Czym jest Angular i dlaczego powstał
 
