@@ -53,7 +53,7 @@ This installs all Angular and TypeScript dependencies.
 
 ```bash
 cd backend
-python -m venv venv
+python3 -m venv venv
 
 # Activate virtual environment
 # On macOS/Linux:

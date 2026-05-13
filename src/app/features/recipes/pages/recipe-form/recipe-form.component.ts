@@ -24,6 +24,7 @@ export class RecipeFormComponent implements OnInit {
   recipeForm: FormGroup;
   isSubmitting = false;
   submitError: string | null = null;
+  readonly fallbackImage = 'assets/recipe-placeholder.svg';
 
   cuisines = ['Chinese', 'Thai', 'Japanese', 'Vietnamese', 'Korean', 'Indian'];
   difficulties = ['easy', 'medium', 'hard'];
@@ -65,7 +66,6 @@ export class RecipeFormComponent implements OnInit {
       instructions: ['', [Validators.required, Validators.minLength(20)]],
       // FormArray for dynamic ingredients
       ingredients: this.fb.array([
-        this.fb.control('', Validators.required),
         this.fb.control('', Validators.required)
       ])
     });
@@ -104,7 +104,11 @@ export class RecipeFormComponent implements OnInit {
   onSubmit(): void {
     // Check if form is valid before submission
     if (this.recipeForm.invalid) {
-      this.submitError = 'Please fill in all required fields correctly.';
+      this.recipeForm.markAllAsTouched();
+      const invalidFields = this.getInvalidFieldLabels();
+      this.submitError = invalidFields.length
+        ? `Please correct: ${invalidFields.join(', ')}.`
+        : 'Please fill in all required fields correctly.';
       return;
     }
 
@@ -112,9 +116,20 @@ export class RecipeFormComponent implements OnInit {
     this.submitError = null;
 
     // Get form data and filter out empty ingredients
+    const formValue = this.recipeForm.value;
     const formData = {
-      ...this.recipeForm.value,
-      ingredients: this.recipeForm.value.ingredients.filter((ing: string) => ing.trim())
+      ...formValue,
+      name: (formValue.name || '').trim(),
+      cuisine: (formValue.cuisine || '').trim(),
+      description: (formValue.description || '').trim(),
+      instructions: (formValue.instructions || '').trim(),
+      imageUrl: (formValue.imageUrl || '').trim() || this.fallbackImage,
+      prepTime: Number(formValue.prepTime),
+      cookTime: Number(formValue.cookTime),
+      servings: Number(formValue.servings),
+      ingredients: (formValue.ingredients || [])
+        .map((ing: string) => (ing || '').trim())
+        .filter((ing: string) => ing.length > 0)
     };
 
     this.recipeService.createRecipe(formData).subscribe(
@@ -125,7 +140,10 @@ export class RecipeFormComponent implements OnInit {
       },
       (error: any) => {
         this.isSubmitting = false;
-        this.submitError = 'Error creating recipe. Please try again.';
+        const offlineError = !error?.status || error?.status === 0;
+        this.submitError = offlineError
+          ? 'Backend API is not reachable. Start FastAPI on port 8000 and try again.'
+          : 'Error creating recipe. Please try again.';
         console.error('Error creating recipe:', error);
       }
     );
@@ -138,5 +156,41 @@ export class RecipeFormComponent implements OnInit {
   hasError(fieldName: string, errorType: string): boolean {
     const field = this.recipeForm.get(fieldName);
     return !!(field && field.hasError(errorType) && (field.dirty || field.touched));
+  }
+
+  hasIngredientError(index: number): boolean {
+    const ingredientControl = this.ingredients.at(index);
+    return !!ingredientControl && ingredientControl.invalid && (ingredientControl.dirty || ingredientControl.touched);
+  }
+
+  private getInvalidFieldLabels(): string[] {
+    const labels: string[] = [];
+
+    if (this.recipeForm.get('name')?.invalid) {
+      labels.push('recipe name');
+    }
+    if (this.recipeForm.get('cuisine')?.invalid) {
+      labels.push('cuisine');
+    }
+    if (this.recipeForm.get('description')?.invalid) {
+      labels.push('description');
+    }
+    if (this.recipeForm.get('prepTime')?.invalid) {
+      labels.push('prep time');
+    }
+    if (this.recipeForm.get('cookTime')?.invalid) {
+      labels.push('cook time');
+    }
+    if (this.recipeForm.get('servings')?.invalid) {
+      labels.push('servings');
+    }
+    if (this.recipeForm.get('instructions')?.invalid) {
+      labels.push('instructions');
+    }
+    if (this.ingredients.controls.some(control => control.invalid)) {
+      labels.push('ingredients');
+    }
+
+    return labels;
   }
 }

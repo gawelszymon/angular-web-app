@@ -23,8 +23,9 @@
     <div class="recipe-header">
       <div class="header-image">
         <img
-          [src]="recipe.imageUrl || 'assets/placeholder.jpg'"
+          [src]="recipe.imageUrl || fallbackImage"
           [alt]="recipe.name"
+          (error)="onImageError($event)"
           class="recipe-image"
         >
       </div>

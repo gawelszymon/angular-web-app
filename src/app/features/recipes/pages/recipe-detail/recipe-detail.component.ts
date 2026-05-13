@@ -22,6 +22,7 @@ export class RecipeDetailComponent implements OnInit {
   recipe: Recipe | null = null;
   isLoading = true;
   error: string | null = null;
+  readonly fallbackImage = 'assets/recipe-placeholder.svg';
 
   /**
    * Dependency Injection:
@@ -73,5 +74,13 @@ export class RecipeDetailComponent implements OnInit {
    */
   getTotalTime(): number {
     return (this.recipe?.prepTime || 0) + (this.recipe?.cookTime || 0);
+  }
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target.src.includes(this.fallbackImage)) {
+      return;
+    }
+    target.src = this.fallbackImage;
   }
 }

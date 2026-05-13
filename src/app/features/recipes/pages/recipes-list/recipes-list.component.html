@@ -26,23 +26,25 @@
   <!-- async pipe: Automatically subscribes/unsubscribes to Observable -->
   <!-- let recipes = (recipes$ | async) extracts data from Observable -->
   <div class="recipes-grid" *ngIf="recipes$ | async as recipes; else loading">
+    <ng-container *ngIf="getFilteredRecipes(recipes) as filteredRecipes">
     <!-- *ngIf with else condition - conditional rendering -->
 
     <!-- Empty state -->
-    <div class="empty-state" *ngIf="recipes.length === 0">
+    <div class="empty-state" *ngIf="filteredRecipes.length === 0">
       <p>No recipes found. Try a different filter!</p>
     </div>
 
     <!-- Recipe cards -->
     <!-- Track by improves performance: Angular knows which items changed -->
     <div
-      *ngFor="let recipe of recipes; trackBy: trackByRecipeId"
+      *ngFor="let recipe of filteredRecipes; trackBy: trackByRecipeId"
       class="recipe-card"
     >
       <div class="card-image">
         <img
-          [src]="recipe.imageUrl || 'assets/placeholder.jpg'"
+          [src]="recipe.imageUrl || fallbackImage"
           [alt]="recipe.name"
+          (error)="onImageError($event)"
           class="recipe-image"
         >
       </div>
@@ -73,6 +75,7 @@
         </div>
       </div>
     </div>
+    </ng-container>
   </div>
 
   <!-- Loading state template -->

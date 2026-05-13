@@ -26,6 +26,7 @@ export class RecipesListComponent implements OnInit {
   // State management for UI
   selectedCuisine = 'All';
   cuisineList = ['All', 'Chinese', 'Thai', 'Japanese', 'Vietnamese', 'Korean', 'Indian'];
+  readonly fallbackImage = 'assets/recipe-placeholder.svg';
 
   /**
    * Constructor with Dependency Injection
@@ -53,6 +54,15 @@ export class RecipesListComponent implements OnInit {
     this.selectedCuisine = cuisine;
   }
 
+  getFilteredRecipes(recipes: Recipe[]): Recipe[] {
+    if (this.selectedCuisine === 'All') {
+      return recipes;
+    }
+
+    const selectedCuisine = this.selectedCuisine.toLowerCase();
+    return recipes.filter((recipe) => recipe.cuisine.toLowerCase() === selectedCuisine);
+  }
+
   /**
    * Delete a recipe
    * Calls service, then refreshes the list
@@ -77,5 +87,13 @@ export class RecipesListComponent implements OnInit {
    */
   trackByRecipeId(index: number, recipe: Recipe): number {
     return recipe.id;
+  }
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target.src.includes(this.fallbackImage)) {
+      return;
+    }
+    target.src = this.fallbackImage;
   }
 }

@@ -1,0 +1,42 @@
+{
+  "8": {
+    "id": 8,
+    "name": "Pad Thai",
+    "cuisine": "Thai",
+    "description": "A popular Thai street food made with stir-fried rice noodles, shrimp, and a tangy tamarind sauce.",
+    "ingredients": [
+      "3 cups rice noodles",
+      "2 cups shrimp",
+      "2 eggs",
+      "1/4 cup peanuts"
+    ],
+    "instructions": "1. Cook rice noodles according to package directions. 2. Heat oil in a wok over high heat. 3. Add garlic and shrimp, cook until pink. 4. Add noodles and tamarind paste, toss well. 5. Push noodles to the side, scramble eggs in the empty space. 6. Mix eggs with noodles. 7. Add bean sprouts and scallions. 8. Serve topped with peanuts and lime.",
+    "difficulty": "medium",
+    "prepTime": 15,
+    "cookTime": 10,
+    "servings": 4,
+    "imageUrl": "https://thai-foodie.com/wp-content/uploads/2025/09/pad-thai-chicken-plated-fork.jpg",
+    "createdAt": "2026-05-13T15:43:23.783005",
+    "updatedAt": "2026-05-13T15:43:23.783005"
+  },
+  "10": {
+    "id": 10,
+    "name": "Sushi rolls",
+    "cuisine": "Japanese",
+    "description": "Traditional Japanese meal.",
+    "ingredients": [
+      "Fish",
+      "Rice",
+      "Nori",
+      "Ginger"
+    ],
+    "instructions": "You have to boil the rice and then add the rest of the ingredients.",
+    "difficulty": "hard",
+    "prepTime": 30,
+    "cookTime": 15,
+    "servings": 5,
+    "imageUrl": "https://kochamwroclaw.pl/wp-content/uploads/riccardo-bergamini-O2yNzXdqOu0-unsplash.jpg",
+    "createdAt": "2026-05-13T15:47:35.368988",
+    "updatedAt": "2026-05-13T15:47:35.368988"
+  }
+}

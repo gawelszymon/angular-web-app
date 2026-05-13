@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+from pathlib import Path
+import json
 
 # Initialize FastAPI application
 app = FastAPI(
@@ -62,10 +64,12 @@ class RecipeCreate(BaseModel):
 
 
 # ============================================================================
-# SAMPLE DATA - In-memory storage (replace with database in production)
+# DATA STORAGE - File-backed storage (simple JSON "database")
 # ============================================================================
 
-recipes_db = {
+DATA_FILE = Path(__file__).parent / "data" / "recipes.json"
+
+DEFAULT_RECIPES = {
     1: {
         "id": 1,
         "name": "Pad Thai",
@@ -116,7 +120,33 @@ recipes_db = {
     }
 }
 
-next_recipe_id = 3
+
+def save_recipes() -> None:
+    """Persist recipes to disk as JSON."""
+    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    serializable_data = {str(key): value for key, value in recipes_db.items()}
+    DATA_FILE.write_text(json.dumps(serializable_data, ensure_ascii=False, indent=2))
+
+
+def load_recipes() -> dict[int, dict]:
+    """Load recipes from disk; fallback to defaults if file is missing or invalid."""
+    if DATA_FILE.exists():
+        try:
+            parsed = json.loads(DATA_FILE.read_text())
+            return {int(key): value for key, value in parsed.items()}
+        except (json.JSONDecodeError, ValueError):
+            # If file is corrupted, keep app running with defaults.
+            pass
+
+    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    DATA_FILE.write_text(
+        json.dumps({str(key): value for key, value in DEFAULT_RECIPES.items()}, ensure_ascii=False, indent=2)
+    )
+    return {key: value.copy() for key, value in DEFAULT_RECIPES.items()}
+
+
+recipes_db = load_recipes()
+next_recipe_id = (max(recipes_db.keys()) + 1) if recipes_db else 1
 
 
 # ============================================================================
@@ -169,6 +199,7 @@ async def create_recipe(recipe: RecipeCreate):
     )
 
     recipes_db[next_recipe_id] = new_recipe.dict()
+    save_recipes()
     next_recipe_id += 1
 
     return new_recipe
@@ -197,6 +228,7 @@ async def update_recipe(recipe_id: int, recipe: RecipeCreate):
     )
 
     recipes_db[recipe_id] = updated_recipe.dict()
+    save_recipes()
     return updated_recipe
 
 
@@ -213,6 +245,7 @@ async def delete_recipe(recipe_id: int):
         )
 
     del recipes_db[recipe_id]
+    save_recipes()
     return None
 
 
