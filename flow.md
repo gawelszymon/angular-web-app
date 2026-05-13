@@ -75,6 +75,14 @@ recipes/
 
 **Standalone Components** – Angular bez modułów (NgModules). Komponent sam w sobie jest niezależny i można go importować bezpośrednio.
 
+| Plik | Zawartość | Dlaczego? |
+|------|-----------|----------|
+| `.ts` | Logika TypeScript | Zachowuje czystość kodu |
+| `.html` | Struktura HTML | Separacja zobrazowania |
+| `.scss` | Stylowanie CSS | Oddzielnie od logiki |
+
+**Zasada:** Każdy plik ma **jedną odpowiedzialność** — to czyni kod łatwejszy do czytania, testowania i utrzymania! 🎯
+
 **Lazy Loading** – komponent ładuje się dopiero gdy użytkownik wejdzie na daną ścieżkę, a nie od razu przy starcie aplikacji.
 
 **Reactive Forms** – formularz z logiką w TypeScript. Pozwala na dynamiczne dodawanie/usuwanie pól (np. lista składników) z pełną kontrolą walidacji.
