@@ -1,0 +1,30 @@
+<div class="app-container">
+  <!-- HEADER/NAVIGATION -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="logo">
+        <span class="emoji">🍜</span>
+        {{ title }}
+      </h1>
+
+      <!-- NAVIGATION LINKS using RouterLink -->
+      <!-- Angular Characteristic: Routing - navigation without full page reload -->
+      <nav class="navbar">
+        <a routerLink="/recipes" class="nav-link">All Recipes</a>
+        <a routerLink="/recipes/create" class="nav-link">Add Recipe</a>
+        <a routerLink="/about" class="nav-link">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT AREA -->
+  <!-- RouterOutlet is where Angular renders the matched route component -->
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>&copy; 2024 Asian Cuisine Recipes. All rights reserved.</p>
+  </footer>
+</div>

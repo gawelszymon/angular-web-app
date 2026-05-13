@@ -1,0 +1,84 @@
+<div class="recipes-container">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>🍲 Asian Cuisine Recipes</h1>
+    <p>Explore delicious recipes from across Asia</p>
+  </div>
+
+  <!-- FILTER SECTION -->
+  <!-- Angular Characteristic: Event Binding and Two-way Binding -->
+  <div class="filter-section">
+    <h3>Filter by Cuisine:</h3>
+    <div class="filter-buttons">
+      <!-- *ngFor - Structural directive for iterating over arrays -->
+      <button
+        *ngFor="let cuisine of cuisineList"
+        [class.active]="selectedCuisine === cuisine"
+        (click)="filterByCuisine(cuisine)"
+        class="filter-btn"
+      >
+        {{ cuisine }}
+      </button>
+    </div>
+  </div>
+
+  <!-- RECIPES GRID -->
+  <!-- async pipe: Automatically subscribes/unsubscribes to Observable -->
+  <!-- let recipes = (recipes$ | async) extracts data from Observable -->
+  <div class="recipes-grid" *ngIf="recipes$ | async as recipes; else loading">
+    <!-- *ngIf with else condition - conditional rendering -->
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="recipes.length === 0">
+      <p>No recipes found. Try a different filter!</p>
+    </div>
+
+    <!-- Recipe cards -->
+    <!-- Track by improves performance: Angular knows which items changed -->
+    <div
+      *ngFor="let recipe of recipes; trackBy: trackByRecipeId"
+      class="recipe-card"
+    >
+      <div class="card-image">
+        <img
+          [src]="recipe.imageUrl || 'assets/placeholder.jpg'"
+          [alt]="recipe.name"
+          class="recipe-image"
+        >
+      </div>
+
+      <div class="card-content">
+        <!-- Property binding: binds component data to template -->
+        <h3>{{ recipe.name }}</h3>
+        <p class="cuisine-badge">{{ recipe.cuisine }}</p>
+
+        <div class="recipe-meta">
+          <span class="badge difficulty" [ngClass]="'difficulty-' + recipe.difficulty">
+            {{ recipe.difficulty | uppercase }}
+          </span>
+          <span class="badge time">⏱️ {{ recipe.prepTime + recipe.cookTime }} min</span>
+          <span class="badge servings">🍽️ {{ recipe.servings }} servings</span>
+        </div>
+
+        <p class="description">{{ recipe.description }}</p>
+
+        <div class="card-actions">
+          <!-- RouterLink - Navigate without page reload -->
+          <a [routerLink]="['/recipes', recipe.id]" class="btn btn-primary">
+            View Recipe
+          </a>
+          <button (click)="deleteRecipe(recipe.id)" class="btn btn-danger">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state template -->
+  <ng-template #loading>
+    <div class="loading">
+      <p>Loading recipes...</p>
+    </div>
+  </ng-template>
+</div>

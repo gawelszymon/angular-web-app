@@ -1,0 +1,106 @@
+<div class="recipe-detail-container">
+  <!-- LOADING STATE -->
+  <!-- Structural directive *ngIf for conditional rendering -->
+  <div class="loading" *ngIf="isLoading">
+    <p>Loading recipe details...</p>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div class="error-message" *ngIf="error">
+    <p>⚠️ {{ error }}</p>
+    <a routerLink="/recipes" class="btn btn-primary">Back to Recipes</a>
+  </div>
+
+  <!-- RECIPE CONTENT -->
+  <!-- *ngIf with else template for error handling -->
+  <ng-container *ngIf="recipe && !isLoading; else noRecipe">
+    <!-- BACK BUTTON -->
+    <div class="back-button">
+      <a routerLink="/recipes" class="link">← Back to Recipes</a>
+    </div>
+
+    <!-- RECIPE HEADER -->
+    <div class="recipe-header">
+      <div class="header-image">
+        <img
+          [src]="recipe.imageUrl || 'assets/placeholder.jpg'"
+          [alt]="recipe.name"
+          class="recipe-image"
+        >
+      </div>
+
+      <div class="header-info">
+        <h1>{{ recipe.name }}</h1>
+        <p class="cuisine">{{ recipe.cuisine }} Cuisine</p>
+
+        <div class="recipe-stats">
+          <div class="stat">
+            <span class="label">Prep Time:</span>
+            <span class="value">{{ recipe.prepTime }} min</span>
+          </div>
+          <div class="stat">
+            <span class="label">Cook Time:</span>
+            <span class="value">{{ recipe.cookTime }} min</span>
+          </div>
+          <div class="stat">
+            <span class="label">Total Time:</span>
+            <span class="value">{{ getTotalTime() }} min</span>
+          </div>
+          <div class="stat">
+            <span class="label">Servings:</span>
+            <span class="value">{{ recipe.servings }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Difficulty:</span>
+            <span class="value" [ngClass]="'difficulty-' + recipe.difficulty">
+              {{ recipe.difficulty | uppercase }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="recipe-section">
+      <h2>About this Recipe</h2>
+      <p>{{ recipe.description }}</p>
+    </div>
+
+    <!-- INGREDIENTS SECTION -->
+    <div class="recipe-section">
+      <h2>Ingredients</h2>
+      <!-- *ngFor with trackBy for performance -->
+      <ul class="ingredients-list">
+        <li *ngFor="let ingredient of recipe.ingredients; let i = index" class="ingredient-item">
+          <span class="ingredient-number">{{ i + 1 }}.</span>
+          {{ ingredient }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- INSTRUCTIONS SECTION -->
+    <div class="recipe-section">
+      <h2>Instructions</h2>
+      <!-- Format instructions: split by newlines to show step-by-step -->
+      <div class="instructions">
+        <p *ngFor="let instruction of recipe.instructions.split('\\n')" class="instruction-step">
+          {{ instruction }}
+        </p>
+      </div>
+    </div>
+
+    <!-- META INFORMATION -->
+    <div class="recipe-meta">
+      <small *ngIf="recipe.createdAt">Created: {{ recipe.createdAt | date:'short' }}</small>
+      <small *ngIf="recipe.updatedAt">Updated: {{ recipe.updatedAt | date:'short' }}</small>
+    </div>
+  </ng-container>
+
+  <!-- NO RECIPE FOUND -->
+  <ng-template #noRecipe>
+    <div class="no-recipe">
+      <p>Recipe not found.</p>
+      <a routerLink="/recipes" class="btn btn-primary">Back to Recipes</a>
+    </div>
+  </ng-template>
+</div>

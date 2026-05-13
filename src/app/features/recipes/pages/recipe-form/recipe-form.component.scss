@@ -1,0 +1,279 @@
+// Recipe form component styles
+.recipe-form-container {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// FORM HEADER
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+// ERROR MESSAGE
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+  border: 1px solid #f5c6cb;
+
+  p {
+    margin: 0;
+  }
+}
+
+// FORM STYLES
+.recipe-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+// FORM SECTIONS
+.form-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e0e0e0;
+
+  &:last-of-type {
+    border-bottom: none;
+    margin-bottom: 2rem;
+    padding-bottom: 0;
+  }
+
+  h2 {
+    color: #333;
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 1.5rem;
+      background: #667eea;
+      border-radius: 2px;
+      margin-right: 0.8rem;
+    }
+  }
+
+  .section-help {
+    color: #999;
+    font-size: 0.95rem;
+    margin: -0.5rem 0 1rem 0;
+  }
+}
+
+// FORM GROUPS
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    &::placeholder {
+      color: #999;
+    }
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .error-text {
+    display: block;
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+
+  .hint {
+    display: block;
+    color: #999;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+}
+
+// FORM ROW - Multiple inputs in one row
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  .form-group {
+    margin-bottom: 0;
+  }
+}
+
+// INGREDIENT INPUT GROUP
+.ingredient-input-group {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  align-items: flex-start;
+
+  input {
+    flex: 1;
+  }
+
+  .btn-small {
+    padding: 0.8rem 1rem;
+    margin-top: 0;
+    white-space: nowrap;
+  }
+}
+
+// BUTTONS
+.btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &-primary {
+    background: #667eea;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+  }
+
+  &-secondary {
+    background: #f0f0f0;
+    color: #333;
+    border: 2px solid #e0e0e0;
+
+    &:hover:not(:disabled) {
+      background: #e0e0e0;
+      border-color: #d0d0d0;
+    }
+  }
+
+  &-danger {
+    background: #dc3545;
+    color: white;
+    padding: 0.6rem 1rem;
+
+    &:hover:not(:disabled) {
+      background: #c82333;
+    }
+  }
+
+  &-small {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  &-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+}
+
+// FORM ACTIONS
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+
+  .btn {
+    flex: 1;
+    max-width: 300px;
+  }
+}
+
+// RESPONSIVE DESIGN
+@media (max-width: 768px) {
+  .recipe-form {
+    padding: 1.5rem;
+  }
+
+  .form-header h1 {
+    font-size: 2rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ingredient-input-group {
+    flex-direction: column;
+
+    .btn-small {
+      width: 100%;
+    }
+  }
+
+  .form-actions {
+    flex-direction: column;
+
+    .btn {
+      max-width: 100%;
+    }
+  }
+}

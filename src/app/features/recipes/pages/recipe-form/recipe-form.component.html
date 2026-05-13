@@ -1,0 +1,231 @@
+<div class="recipe-form-container">
+  <!-- PAGE HEADER -->
+  <div class="form-header">
+    <h1>➕ Create New Recipe</h1>
+    <p>Share your favorite Asian cuisine recipe with the community</p>
+  </div>
+
+  <!-- ERROR MESSAGE -->
+  <div class="error-message" *ngIf="submitError">
+    <p>⚠️ {{ submitError }}</p>
+  </div>
+
+  <!-- FORM -->
+  <!-- FormGroup directive binds form to component's recipeForm -->
+  <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()" class="recipe-form">
+
+    <!-- BASIC INFORMATION SECTION -->
+    <div class="form-section">
+      <h2>Basic Information</h2>
+
+      <!-- NAME FIELD -->
+      <div class="form-group">
+        <label for="name">Recipe Name *</label>
+        <input
+          id="name"
+          type="text"
+          class="form-control"
+          formControlName="name"
+          placeholder="e.g., Pad Thai"
+        >
+        <!-- Show validation error if field has error -->
+        <small class="error-text" *ngIf="hasError('name', 'required')">
+          Recipe name is required
+        </small>
+        <small class="error-text" *ngIf="hasError('name', 'minlength')">
+          Recipe name must be at least 3 characters
+        </small>
+      </div>
+
+      <!-- CUISINE DROPDOWN -->
+      <div class="form-group">
+        <label for="cuisine">Cuisine *</label>
+        <!-- [(ngModel)] - Two-way binding for select -->
+        <select
+          id="cuisine"
+          class="form-control"
+          formControlName="cuisine"
+        >
+          <option value="">Select cuisine</option>
+          <!-- *ngFor - Loop through cuisines array -->
+          <option *ngFor="let cuisine of cuisines" [value]="cuisine">
+            {{ cuisine }}
+          </option>
+        </select>
+        <small class="error-text" *ngIf="hasError('cuisine', 'required')">
+          Please select a cuisine
+        </small>
+      </div>
+
+      <!-- DESCRIPTION FIELD -->
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea
+          id="description"
+          class="form-control"
+          formControlName="description"
+          placeholder="Describe your recipe..."
+          rows="4"
+        ></textarea>
+        <small class="error-text" *ngIf="hasError('description', 'required')">
+          Description is required
+        </small>
+      </div>
+    </div>
+
+    <!-- COOKING DETAILS SECTION -->
+    <div class="form-section">
+      <h2>Cooking Details</h2>
+
+      <div class="form-row">
+        <!-- PREP TIME -->
+        <div class="form-group">
+          <label for="prepTime">Prep Time (minutes) *</label>
+          <input
+            id="prepTime"
+            type="number"
+            class="form-control"
+            formControlName="prepTime"
+            min="0"
+          >
+          <small class="error-text" *ngIf="hasError('prepTime', 'required')">
+            Prep time is required
+          </small>
+        </div>
+
+        <!-- COOK TIME -->
+        <div class="form-group">
+          <label for="cookTime">Cook Time (minutes) *</label>
+          <input
+            id="cookTime"
+            type="number"
+            class="form-control"
+            formControlName="cookTime"
+            min="0"
+          >
+          <small class="error-text" *ngIf="hasError('cookTime', 'required')">
+            Cook time is required
+          </small>
+        </div>
+
+        <!-- SERVINGS -->
+        <div class="form-group">
+          <label for="servings">Servings *</label>
+          <input
+            id="servings"
+            type="number"
+            class="form-control"
+            formControlName="servings"
+            min="1"
+          >
+          <small class="error-text" *ngIf="hasError('servings', 'required')">
+            Servings is required
+          </small>
+        </div>
+
+        <!-- DIFFICULTY -->
+        <div class="form-group">
+          <label for="difficulty">Difficulty *</label>
+          <select
+            id="difficulty"
+            class="form-control"
+            formControlName="difficulty"
+          >
+            <option *ngFor="let level of difficulties" [value]="level">
+              {{ level | uppercase }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- IMAGE URL -->
+      <div class="form-group">
+        <label for="imageUrl">Image URL (optional)</label>
+        <input
+          id="imageUrl"
+          type="url"
+          class="form-control"
+          formControlName="imageUrl"
+          placeholder="https://example.com/image.jpg"
+        >
+      </div>
+    </div>
+
+    <!-- INGREDIENTS SECTION -->
+    <div class="form-section">
+      <h2>Ingredients</h2>
+      <p class="section-help">Add the ingredients needed for your recipe</p>
+
+      <!-- FormArray - Dynamic list of ingredients -->
+      <!-- formArrayName connects to ingredients FormArray in component -->
+      <div formArrayName="ingredients">
+        <!-- Loop through each ingredient control -->
+        <div
+          *ngFor="let ingredient of ingredients.controls; let i = index"
+          class="ingredient-input-group"
+        >
+          <!-- formControlName binds directly to the indexed control in the FormArray -->
+          <input
+            type="text"
+            class="form-control"
+            [formControlName]="i"
+            placeholder="e.g., 2 cups of rice noodles"
+          >
+          <!-- Remove button - disable if only one ingredient left -->
+          <button
+            type="button"
+            class="btn btn-small btn-danger"
+            (click)="removeIngredient(i)"
+            [disabled]="ingredients.length === 1"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <!-- ADD INGREDIENT BUTTON -->
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="addIngredient()"
+      >
+        + Add Ingredient
+      </button>
+    </div>
+
+    <!-- INSTRUCTIONS SECTION -->
+    <div class="form-section">
+      <h2>Instructions</h2>
+      <p class="section-help">Provide step-by-step cooking instructions</p>
+
+      <div class="form-group">
+        <label for="instructions">Instructions *</label>
+        <textarea
+          id="instructions"
+          class="form-control"
+          formControlName="instructions"
+          placeholder="1. Step one&#10;2. Step two&#10;3. Step three..."
+          rows="8"
+        ></textarea>
+        <small class="hint">Separate each step with a new line</small>
+        <small class="error-text" *ngIf="hasError('instructions', 'required')">
+          Instructions are required
+        </small>
+      </div>
+    </div>
+
+    <!-- FORM ACTIONS -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn btn-primary btn-lg"
+        [disabled]="isSubmitting || recipeForm.invalid"
+      >
+        {{ isSubmitting ? 'Creating...' : 'Create Recipe' }}
+      </button>
+      <a routerLink="/recipes" class="btn btn-secondary btn-lg">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
